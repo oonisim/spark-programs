@@ -1,3 +1,8 @@
+//--------------------------------------------------------------------------------
+// MapR DEV 360 - Apache Spark Essentials
+// https://www.mapr.com/services/mapr-academy/apache-spark-essentials
+// Lesson 2 - Load and Inspect Data
+//--------------------------------------------------------------------------------
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
