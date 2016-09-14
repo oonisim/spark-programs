@@ -20,7 +20,7 @@ case class Auctions(
   itemtype: String,
   dtl: Int)
 
-class AuctionDataFrame {
+object AuctionDataFrame {
   val AUCID = 0
   val BID = 1
   val BIDTIME = 2
@@ -53,21 +53,17 @@ class AuctionDataFrame {
 
     //registering the DataFrame as a temporary table
     auctionsDF.registerTempTable("auctionsDF")
-
     // see the schema for the DataFrame
     auctionsDF.printSchema()
-
     // check the data in the DataFrame.
     val auctions = sqlContext.sql("SELECT * FROM auctionsDF limit 5")
     auctions.show()
-    
     // total number of bids
     val totbids = auctionsDF.count()
-
     // number of distinct auctions
     val totitems = auctionsDF.select("aucid").distinct().count()
     println("number of distinct auctions is %d".format(totitems))
-
+    
     // number of distinct itemtypes?
     val itemtypes = auctionsDF.select("itemtype").distinct().count()
     println("number of distinct item type is %d".format(itemtypes))
@@ -77,6 +73,8 @@ class AuctionDataFrame {
     counts.show()
     val rows = sqlContext.sql("SELECT itemtype, aucid, count(*) FROM auctionsDF GROUP BY itemtype, aucid")
     rows.show()
-
+    
+    // the number of auctions with final price greater than 200
+    val matches = auctionsDF.filter(auctionsDF("price") > 200)
   }
 }
