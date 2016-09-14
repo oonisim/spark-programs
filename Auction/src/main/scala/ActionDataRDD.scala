@@ -1,14 +1,14 @@
 //--------------------------------------------------------------------------------
 // MapR DEV 360 - Apache Spark Essentials
 // https://www.mapr.com/services/mapr-academy/apache-spark-essentials
-// Lesson 2 - Load and Inspect Data
+// Lab 2.1: Load & Inspect Data
 //--------------------------------------------------------------------------------
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
 import java.lang.Math
 
-object AuctionData {
+object AuctionDataRDD {
   val AUCID = 0
   val BID = 1
   val BIDTIME = 2
@@ -21,7 +21,7 @@ object AuctionData {
 
   def section = println("--------------------------------------------------------------------------------")
   def main(args: Array[String]) {
-    val conf = new SparkConf().setAppName("AuctionData")
+    val conf = new SparkConf().setAppName("AuctionDataRDD")
     val sc = new SparkContext(conf)
 
     val auctionRDD = sc.textFile("hdfs:/user/wynadmin/auctiondata.csv").map(_.split(","))
