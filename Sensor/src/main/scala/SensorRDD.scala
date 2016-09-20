@@ -18,7 +18,8 @@ object SensorRDD extends Serializable {
 
   def main(args: Array[String]): Unit = {
     // set up able configuration
-    val sparkConf = new SparkConf().setAppName("SensorRDD")
+    val sparkConf = new SparkConf()
+      .setAppName("SensorRDD")
       .set("spark.files.overwrite", "true")
     val sc = new SparkContext(sparkConf)
 
@@ -26,7 +27,8 @@ object SensorRDD extends Serializable {
     val ssc = new StreamingContext(sc, Seconds(batchSeconds))
 
     // parse the lines of data into sensor objects
-    val textDStream = ssc.textFileStream("hdfs://localhost:9000/user/wynadmin/stream")
+    //val textDStream = ssc.textFileStream("hdfs://localhost:9000/user/wynadmin/stream")
+    val textDStream = ssc.textFileStream("hdfs:/user/wynadmin/stream")
     textDStream.print()
     val sensorDStream = textDStream.map(parseSensor)
 
@@ -39,7 +41,12 @@ object SensorRDD extends Serializable {
         val alertRDD = rdd.filter(sensor => sensor.psi < 5.0)
         println("low pressure alert ")
         alertRDD.take(2).foreach(println)
-        alertRDD.saveAsTextFile("file:///home/wynadmin/work/spark/")
+        alertRDD.collect()
+        //----------------------------------------------------------------------
+        // Save file in distributed file system, not at each worker node.
+        //----------------------------------------------------------------------
+        //alertRDD.saveAsTextFile("file:///home/wynadmin/work/spark/alertout") // <----- executed at worker nodes.
+        alertRDD.saveAsTextFile("hdfs:/user/wynadmin/alertout")
 
       }
     }
