@@ -19,6 +19,6 @@ object IVR {
     //IVRSegment.save(sc, IVRSegment.getRDD(sc))
     //IVRMenu.save(sc, IVRMenu.getRDD(sc))
     AgentCallSegment.save(sc, AgentCallSegment.getRDD(sc))
-    AgentCallInteraction.getDF(sc)
+    AgentCallInteraction.save(sc, AgentCallInteraction.getDF(sc))
   }
 }

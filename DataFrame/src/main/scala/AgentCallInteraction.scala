@@ -46,27 +46,17 @@ object AgentCallInteraction {
     df.printSchema()
     df.registerTempTable("calls")
     
-    val sql1 = """
-      SELECT 
-        call_id,
-        binary(prim_agent),
-        (
-          SELECT MAX(start_time)
-          FROM calls
-          WHERE call_id = outer.call_id 
-          GROUP BY call_id
-        ) as max
-      FROM calls outer
-    """
-    val sql3 = """
-      SELECT
+    val sql = """
+      SELECT DISTINCT
         a.call_id,
         a.start_time,
         a.end_time,
         unix_timestamp(end_time) - unix_timestamp(start_time) as duration,
+        acct.acct_id,
         a.primaryAgentCount,
         a.totalAgentCount
-      FROM (
+      FROM 
+      (
         SELECT
           call_id,
           MIN(start_time) as start_time,
@@ -76,58 +66,19 @@ object AgentCallInteraction {
         FROM calls
         GROUP BY
           call_id
-      ) a
-    """
-    val sql4 = """
-      SELECT
-        a.call_id,
-        a.start_time,
-        a.end_time,
-        a.primaryAgentCount,
-        a.totalAgentCount
-      FROM 
-        (
-          SELECT
-            call_id,
-            MIN(start_time) as start_time,
-            MAX(end_time) as end_time,
-            SUM(binary(prim_agent)) as primaryAgentCount,
-            COUNT(*) as totalAgentCount
-            FROM calls
-          GROUP BY
-            call_id
-        ) a
-        INNER JOIN (
-        ) 
-    """
-    val sql5 = """
-      SELECT
-        o.call_id,
-        o.start_time,
-        o.end_time,
-        (
-          SELECT SUM(binary(prim_agent))
-          FROM calls
-          WHERE call_id = o.call_id
-          GROUP BY call_id
-        ) as primaryAgentCount,
-        (
-          SELECT COUNT(*)
-          FROM calls
-          WHERE call_id = o.call_id
-        ) as totalAgentCount
-      FROM (
-        SELECT
-          call_id,
-          MIN(start_time) as start_time,
-          MAX(end_time) as end_time,
-          COUNT(*) as totalAgentCount
+      ) a 
+      INNER JOIN
+      (
+        SELECT 
+          call_id, 
+          first(acct_id, false) as acct_id
         FROM calls
-        GROUP BY
-          call_id
-      ) o // outer SQL
+        GROUP BY call_id
+      ) acct
+      ON a.call_id = acct.call_id
     """
-    val sql = sql3
+    
+    
     //val groups = sqlContext.sql("SELECT min(start_time), max(end_time), call_id FROM calls GROUP BY call_id")
     val groups = sqlContext.sql(sql)
     
