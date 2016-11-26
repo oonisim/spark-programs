@@ -34,9 +34,6 @@ object IVRSegment {
 
 
   def getRDD(sc: SparkContext): RDD[IVRSegment] = {
-    val sqlContext = new org.apache.spark.sql.SQLContext(sc)
-    import sqlContext.implicits._
-    
     val rdd = IVRInput.getRDD(sc)
     val segments = for {
         input <- rdd if (input.stype != "DUP")

@@ -49,19 +49,6 @@ object IVRInput {
   val TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSSSSS"
 
   def getRDD(sc: SparkContext): RDD[IVRInput] = {
-/*    
-    sc.textFile(IVRInput.INPUT_FILE)
-      .map(line => line.split(IVRInput.CSV_SEPARATOR))
-      .map(fields => IVRInput(
-        fields(TIMESTAMP_COLUMN),
-        fields(ACCT_ID_COLUMN),
-        fields(CALL_ID_COLUMN),
-        fields(NUMBER_DIALED_COLUMN),
-        fields(MENU_ID_COLUMN),
-        fields(MENU_DURATION_COLUMN),
-        fields(MENU_INPUT_COLUMN),
-        fields(TYPE_COLUMN)))
-*/
     val records = sc.textFile(INPUT_FILE).map(line => line.split(CSV_SEPARATOR))
     val inputs = for {
         fields <- records
