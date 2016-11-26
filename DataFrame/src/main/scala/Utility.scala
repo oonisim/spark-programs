@@ -3,7 +3,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.lang.Math
 
-
 object Utility {
    def timestampFormatter(format: String) : SimpleDateFormat = {
     new SimpleDateFormat(format)

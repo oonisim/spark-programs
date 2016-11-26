@@ -13,8 +13,8 @@ import java.lang.Math
 import Utility._
 
 case class IVRSegment(
-  start_time: String,
-  end_time: String,
+  start_time: Timestamp,
+  end_time: Timestamp,
   duration: Int,
   acct_id: String,
   call_id: String,
@@ -33,34 +33,59 @@ object IVRSegment {
   val OUTPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/IVRSegment"
 
   /**
-   * Set of IVR segments excluding all records of type = dup from the original "IVR Segments" data. 
+   * --------------------------------------------------------------------------------
+   * Set of IVR segments excluding all records of type = dup.
+   * --------------------------------------------------------------------------------
    */
   def getRDD(sc: SparkContext): RDD[IVRSegment] = {
     val rdd = IVRInput.getRDD(sc)
     val segments = for {
       input <- rdd if (input.stype != "DUP")
     } yield {
+      //--------------------------------------------------------------------------------
+      // Get the end_time by start_time + sum(values in field menuDuration).
+      // Use start_time if field menuDuration is empty.
+      // Example of menuDuration: "10~5~4"
+      //--------------------------------------------------------------------------------
       val start = input.event_timestamp
-      val durations = input.menuDuration.split(IVRInput.MULTIFIELD_SEPARATOR)
-      val total = durations.foldLeft(0)((total, duration) => total + duration.toInt)
-      val end = advTimestamp(start, total)
+      val (total: Int, end: Timestamp, count:Int) = if (input.menuDuration != "") {
+        val durations = input.menuDuration.split(IVRInput.MULTIFIELD_SEPARATOR)
+        val total = durations.foldLeft(0)((total, duration) => total + duration.toInt)
+        val end = advTimestamp(start, total)
+        (total, end, durations.length)
+      } else {
+        (0, start, 0)
+      }
 
       IVRSegment(
-        timestampFormatter(IVRInput.TIMESTAMP_FORMAT).format(start),
-        timestampFormatter(IVRInput.TIMESTAMP_FORMAT).format(end),
+        //timestampFormatter(IVRInput.TIMESTAMP_FORMAT).format(start),
+        //timestampFormatter(IVRInput.TIMESTAMP_FORMAT).format(end),
+        start,
+        end,
         total,
         input.acct_id,
         input.call_id,
         input.numberDialed,
-        durations.length)
+        count)
     }
     segments
   }
+
+  /**
+   * --------------------------------------------------------------------------------
+   * Set of IVRSergment in DataFrame
+   * --------------------------------------------------------------------------------
+   */
   def getDF(sc: SparkContext): DataFrame = {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._
     getRDD(sc).toDF()
   }
+  /**
+   * --------------------------------------------------------------------------------
+   * Save the IVRSegment DataFrame to CSV under the path directory (not file).
+   * --------------------------------------------------------------------------------
+   */
   def save(sc: SparkContext, rdd: RDD[IVRSegment], path: String = OUTPUT_FILE): Unit = {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._

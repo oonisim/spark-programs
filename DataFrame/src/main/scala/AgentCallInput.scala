@@ -11,7 +11,15 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.lang.Math
 import Utility._
-
+/**
+ * ----------------------------------------------------------------------
+ * Record set of the original Agent call segments.
+ * 
+ * [Reference]
+ * Refer to the 'Agent Call Segment' section of the field descriptions of 
+ * the specification document.
+ * ----------------------------------------------------------------------
+ */
 case class AgentCallInput(
   event_timestamp: Timestamp,
   answer_time_timestamp: Timestamp,
@@ -41,6 +49,23 @@ case class AgentCallInput(
   productType: String)
 
 object AgentCallInput {
+  //----------------------------------------------------------------------
+  // Input file specification.
+  //----------------------------------------------------------------------
+  // [Prerequisite]
+  // Remove the header line in advance to avoid checking every line.
+  //----------------------------------------------------------------------  
+  // agent_call_segments.csv represents Agent Call Segments. 
+  // A customer might talk to multiple agents during a call. (i.e., the call 
+  // is transferred from agent to agent). Each record in this table represents 
+  // one segment of a call. 
+  //----------------------------------------------------------------------  
+  val INPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/agent_call_segments.csv"
+  val CSV_SEPARATOR = ","
+  val MULTIFIELD_SEPARATOR = "~"
+  val TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSSSSS"
+
+  // Column positions in the input.
   val EVENT_TIMESTAMP_COLUMN = 0
   val ANSWER_TIME_TIMESTAMP_COLUMN = 1
   val HANGUP_TIME_TIMESTAMP_COLUMN = 2
@@ -67,13 +92,12 @@ object AgentCallInput {
   val CONFERENCETIME_COLUMN = 23
   val CALLREASON_COLUMN = 24
   val PRODUCTTYPE_COLUMN = 25
-
-  val INPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/agent_call_segments.csv"
-  val OUTPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/AgentCallInput"
-  val CSV_SEPARATOR = ","
-  val MULTIFIELD_SEPARATOR = "~"
-  val TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSSSSS"
-
+  
+  /**
+   * --------------------------------------------------------------------------------
+   * Record set in RDD
+   * --------------------------------------------------------------------------------
+   */
   def getRDD(sc: SparkContext): RDD[AgentCallInput] = {
     val records = sc.textFile(INPUT_FILE).map(line => line.split(CSV_SEPARATOR))
     val calls = for {
@@ -109,11 +133,22 @@ object AgentCallInput {
     }
     calls
   }
+  /**
+   * --------------------------------------------------------------------------------
+   * Record set in DataFrame
+   * --------------------------------------------------------------------------------
+   */
   def getDF(sc: SparkContext): DataFrame = {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._
     getRDD(sc).toDF()
   }
+  /**
+   * --------------------------------------------------------------------------------
+   * Save the record set as CSV in the path directory (not file).
+   * --------------------------------------------------------------------------------
+   */  
+  val OUTPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/AgentCallInput"  
   def save(sc: SparkContext, rdd: RDD[AgentCallInput], path: String = OUTPUT_FILE): Unit = {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._

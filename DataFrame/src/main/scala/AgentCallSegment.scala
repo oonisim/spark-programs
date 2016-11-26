@@ -12,6 +12,15 @@ import java.util.Date
 import java.lang.Math
 import Utility._
 
+/**
+ * --------------------------------------------------------------------------------
+ * Record set of the Agent call segments.
+ * Mostly pass through from the input file except duration.
+ *
+ * [Fields]
+ * duration	: calculated field: end_time - start_time (in seconds)
+ * --------------------------------------------------------------------------------
+ */
 case class AgentCallSegment(
   start_time: Timestamp,
   end_time: Timestamp,
@@ -26,17 +35,17 @@ case class AgentCallSegment(
   agentID: String,
   agentSkillId: String,
   agentGroupId: String,
-  CallType: String,
-  CallDisposition: String,
-  NetworkTime: Int,
-  RingTime: Int,
-  DelayTime: Int,
-  TimeToAband: Int,
-  HoldTime: Int,
-  TalkTime: Int,
-  WorkTime: Int,
-  LocalQTime: Int,
-  ConferenceTime: Int,
+  callType: String,
+  callDisposition: String,
+  networkTime: Int,
+  ringTime: Int,
+  delayTime: Int,
+  timeToAband: Int,
+  holdTime: Int,
+  talkTime: Int,
+  workTime: Int,
+  localQTime: Int,
+  conferenceTime: Int,
   callReason: String,
   productType: String)
 
@@ -68,18 +77,18 @@ object AgentCallSegment {
   val CALLREASON_COLUMN = 24
   val PRODUCTTYPE_COLUMN = 25
 
-  val OUTPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/AgentCallSegment"
-
+  /**
+   * --------------------------------------------------------------------------------
+   * Record set in RDD.
+   * --------------------------------------------------------------------------------
+   */
   def getRDD(sc: SparkContext): RDD[AgentCallSegment] = {
     val inputs = AgentCallInput.getRDD(sc)
-    
-    println("----------------------------------------------------------------------")
-    println("---------- Agent Call Inputs Number is %s".format(inputs.count()))
-    println("----------------------------------------------------------------------")    
+
     val segments = for {
       input <- inputs
     } yield {
-      val duration = ((input.event_timestamp.getTime - input.end_time_timestamp.getTime) / 1000).toInt
+      val duration = ((input.end_time_timestamp.getTime - input.event_timestamp.getTime) / 1000).toInt
       AgentCallSegment(
         input.event_timestamp,
         input.end_time_timestamp,
@@ -108,17 +117,24 @@ object AgentCallSegment {
         input.callReason,
         input.productType)
     }
-    println("----------------------------------------------------------------------")
-    println("---------- Agent call segment size is %s".format(segments.count()))
-    println("----------------------------------------------------------------------")    
-
     segments
   }
+  /**
+   * --------------------------------------------------------------------------------
+   * Record set in DataFrame
+   * --------------------------------------------------------------------------------
+   */
   def getDF(sc: SparkContext): DataFrame = {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._
     getRDD(sc).toDF()
   }
+  /**
+   * --------------------------------------------------------------------------------
+   * Save the record set as CSV in the path directory (not file).
+   * --------------------------------------------------------------------------------
+   */
+  val OUTPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/AgentCallSegment"
   def save(sc: SparkContext, rdd: RDD[AgentCallSegment], path: String = OUTPUT_FILE): Unit = {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._
