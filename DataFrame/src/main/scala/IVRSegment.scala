@@ -32,12 +32,11 @@ object IVRSegment {
 
   val OUTPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/segments"
 
-
   def getRDD(sc: SparkContext): RDD[IVRSegment] = {
     val rdd = IVRInput.getRDD(sc)
     val segments = for {
-        input <- rdd if (input.stype != "DUP")
-     } yield {
+      input <- rdd if (input.stype != "DUP")
+    } yield {
       val start = input.event_timestamp
       val durations = input.menuDuration.split(IVRInput.MULTIFIELD_SEPARATOR)
       val total = durations.foldLeft(0)((total, duration) => total + duration.toInt)
@@ -59,8 +58,9 @@ object IVRSegment {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._
     rdd.toDF().coalesce(1)
-    .write
-    .mode(SaveMode.Overwrite)
-    .csv(path)
+      .write
+      .mode(SaveMode.Overwrite)
+      .option("header", true)
+      .csv(path)
   }
 }
