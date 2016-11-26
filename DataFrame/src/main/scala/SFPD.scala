@@ -6,6 +6,16 @@ import org.apache.spark.sql.SQLContext._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.SparkSession
 
+case class Input(
+  event_timestamp: String,
+  acct_id: String,
+  call_id: String,
+  numberDialed: String,
+  menuId: String,
+  menuDuration: String,
+  menuInput: String,
+  stype: String)
+
 case class Incidents(incidentnum: String, category: String, description: String, dayofweek: String, date: String, time: String, pddistrict: String, resolution: String, address: String, X: Float, Y: Float, pdid: String)
 object SFPD {
   def main(args: Array[String]) {
@@ -23,9 +33,14 @@ object SFPD {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._
 
-    val sfpdRDD = sc.textFile("file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/sfpd.csv").map(inc => inc.split(","))
-    val sfpdCase = sfpdRDD.map(inc => Incidents(inc(0), inc(1), inc(2), inc(3), inc(4), inc(5), inc(6), inc(7), inc(8), inc(9).toFloat, inc(10).toFloat, inc(11)))
+    //val sfpdRDD = sc.textFile("file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/sfpd.csv").map(inc => inc.split(","))
+    //val sfpdCase = sfpdRDD.map(inc => Incidents(inc(0), inc(1), inc(2), inc(3), inc(4), inc(5), inc(6), inc(7), inc(8), inc(9).toFloat, inc(10).toFloat, inc(11)))
+    val sfpdRDD = sc.textFile("file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/ivr_segments.csv").map(inc => inc.split(","))
+    val sfpdCase = sfpdRDD.map(i => Input(i(0), i(1), i(2), i(3), i(4), i(5), i(6), i(7)))
+
     val sfpdDF = sfpdCase.toDF()
+
+    sfpdDF.printSchema()
 
     sfpdDF.registerTempTable("sfpd")
 
