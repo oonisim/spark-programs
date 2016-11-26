@@ -12,7 +12,6 @@ import java.util.Date
 import java.lang.Math
 import Utility._
 
-
 case class IVRInput(
   event_timestamp: Timestamp,
   acct_id: String,
@@ -51,8 +50,8 @@ object IVRInput {
   def getRDD(sc: SparkContext): RDD[IVRInput] = {
     val records = sc.textFile(INPUT_FILE).map(line => line.split(CSV_SEPARATOR))
     val inputs = for {
-        fields <- records
-        stamp <- List(getTimestamp(fields(TIMESTAMP_COLUMN), TIMESTAMP_FORMAT)) if (stamp != None)
+      fields <- records
+      stamp <- List(getTimestamp(fields(TIMESTAMP_COLUMN), TIMESTAMP_FORMAT)) if (stamp != None)
     } yield {
       IVRInput(
         stamp.get,
@@ -62,7 +61,7 @@ object IVRInput {
         fields(MENU_ID_COLUMN),
         fields(MENU_DURATION_COLUMN),
         fields(MENU_INPUT_COLUMN),
-        fields(TYPE_COLUMN))
+        fields(TYPE_COLUMN)) 
     }
     inputs
   }
@@ -75,8 +74,9 @@ object IVRInput {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._
     rdd.toDF().coalesce(1)
-    .write
-    .mode(SaveMode.Overwrite)
-    .csv(path)
+      .write
+      .mode(SaveMode.Overwrite)
+      .option("header", true)
+      .csv(path)
   }
 }

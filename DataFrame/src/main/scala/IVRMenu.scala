@@ -18,10 +18,10 @@ case class IVRMenu(
   duration: Int,
   acct_id: String,
   call_id: String,
-  menu_id: String,  
+  menu_id: String,
   menu_input: String)
 
-object IVRMenu{
+object IVRMenu {
   val START_TIME_COLUMN = 0
   val END_TIME_COLUMN = 1
   val DURATION_COLUMN = 2
@@ -30,14 +30,14 @@ object IVRMenu{
   val MENU_ID_COLUMN = 5
   val MENU_INPUT_COLUMN = 6
 
-  val OUTPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/menus"
+  val OUTPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/IVRMenu"
 
   def getRDD(sc: SparkContext): RDD[IVRMenu] = {
-   
+
     val rdd = IVRInput.getRDD(sc)
     val menus = for {
-        input <- rdd if (input.stype != "DUP")
-        index <- (0 until input.menuId.split(IVRInput.MULTIFIELD_SEPARATOR).length)
+      input <- rdd if (input.stype != "DUP")
+      index <- (0 until input.menuId.split(IVRInput.MULTIFIELD_SEPARATOR).length)
     } yield {
       val start = input.event_timestamp
       val ids = input.menuId.split(IVRInput.MULTIFIELD_SEPARATOR)
@@ -62,10 +62,9 @@ object IVRMenu{
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._
     rdd.toDF().coalesce(1)
-    .write
-    .mode(SaveMode.Overwrite)
-    .csv(path)
+      .write
+      .mode(SaveMode.Overwrite)
+      .option("header", true)
+      .csv(path)
   }
-  
 }
-

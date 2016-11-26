@@ -16,9 +16,11 @@ object IVR {
     val conf = new SparkConf().setAppName("IVR")
     val sc = new SparkContext(conf)
 
-    //IVRSegment.save(sc, IVRSegment.getRDD(sc))
-    //IVRMenu.save(sc, IVRMenu.getRDD(sc))
+    IVRSegment.save(sc, IVRSegment.getRDD(sc))
+    IVRMenu.save(sc, IVRMenu.getRDD(sc))
     AgentCallSegment.save(sc, AgentCallSegment.getRDD(sc))
-    AgentCallInteraction.save(sc, AgentCallInteraction.getDF(sc))
+    AgentCall.save(sc, AgentCall.getDF(sc))
+    CallInteraction.save(sc, CallInteraction.getDF(sc))
+    
   }
 }

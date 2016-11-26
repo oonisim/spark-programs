@@ -68,19 +68,22 @@ object AgentCallSegment {
   val CALLREASON_COLUMN = 24
   val PRODUCTTYPE_COLUMN = 25
 
-  val OUTPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/calls"
+  val OUTPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/AgentCallSegment"
 
   def getRDD(sc: SparkContext): RDD[AgentCallSegment] = {
-    val rdd = AgentCall.getRDD(sc)
+    val inputs = AgentCallInput.getRDD(sc)
+    
+    println("----------------------------------------------------------------------")
+    println("---------- Agent Call Inputs Number is %s".format(inputs.count()))
+    println("----------------------------------------------------------------------")    
     val segments = for {
-      input <- rdd
+      input <- inputs
     } yield {
-      val end = (input.event_timestamp.getTime - input.end_time_timestamp.getTime) / 1000
-
+      val duration = ((input.event_timestamp.getTime - input.end_time_timestamp.getTime) / 1000).toInt
       AgentCallSegment(
         input.event_timestamp,
         input.end_time_timestamp,
-        input.duration,
+        duration,
         input.acct_id,
         input.call_id,
         input.answer_time_timestamp,
@@ -105,6 +108,10 @@ object AgentCallSegment {
         input.callReason,
         input.productType)
     }
+    println("----------------------------------------------------------------------")
+    println("---------- Agent call segment size is %s".format(segments.count()))
+    println("----------------------------------------------------------------------")    
+
     segments
   }
   def getDF(sc: SparkContext): DataFrame = {

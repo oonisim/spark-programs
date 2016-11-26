@@ -30,8 +30,11 @@ object IVRSegment {
   val NUMBER_DIALED_COLUMN = 5
   val MENU_COUNT_COLUMN = 6
 
-  val OUTPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/segments"
+  val OUTPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/IVRSegment"
 
+  /**
+   * Set of IVR segments excluding all records of type = dup from the original "IVR Segments" data. 
+   */
   def getRDD(sc: SparkContext): RDD[IVRSegment] = {
     val rdd = IVRInput.getRDD(sc)
     val segments = for {
@@ -53,7 +56,11 @@ object IVRSegment {
     }
     segments
   }
-
+  def getDF(sc: SparkContext): DataFrame = {
+    val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+    import sqlContext.implicits._
+    getRDD(sc).toDF()
+  }
   def save(sc: SparkContext, rdd: RDD[IVRSegment], path: String = OUTPUT_FILE): Unit = {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._

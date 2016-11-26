@@ -12,114 +12,147 @@ import java.util.Date
 import java.lang.Math
 import Utility._
 
+/**
+ * Record per call_id to summarize an entire call sequence. 
+ */
 case class AgentCall(
-  event_timestamp: Timestamp,
-  answer_time_timestamp: Timestamp,
-  hangup_time_timestamp: Timestamp,
-  end_time_timestamp: Timestamp,
+  start_time: String,
+  end_time: String,
+  duration: Int,    // Duration in seconds from the start to the end of the call.
   acct_id: String,
   call_id: String,
-  sequence_no: String,
-  trans_to: String,
-  prim_agent: String,
-  agentID: String,
-  agentSkillId: String,
-  agentGroupId: String,
-  callType: String,
-  callDisposition: String,
-  networkTime: Int,
-  duration: Int,
-  ringTime: Int,
-  delayTime: Int,
-  timeToAband: Int,
-  holdTime: Int,
-  talkTime: Int,
-  workTime: Int,
-  localQTime: Int,
-  conferenceTime: Int,
-  callReason: String,
-  productType: String)
+  primaryAgentCount: Int,
+  totalAgentCount: Int)
 
 object AgentCall {
-  val EVENT_TIMESTAMP_COLUMN = 0
-  val ANSWER_TIME_TIMESTAMP_COLUMN = 1
-  val HANGUP_TIME_TIMESTAMP_COLUMN = 2
-  val END_TIME_TIMESTAMP_COLUMN = 3
-  val ACCT_ID_COLUMN = 4
-  val CALL_ID_COLUMN = 5
-  val SEQUENCE_NO_COLUMN = 6
-  val TRANS_TO_COLUMN = 7
-  val PRIM_AGENT_COLUMN = 8
-  val AGENTID_COLUMN = 9
-  val AGENTSKILLID_COLUMN = 10
-  val AGENTGROUPID_COLUMN = 11
-  val CALLTYPE_COLUMN = 12
-  val CALLDISPOSITION_COLUMN = 13
-  val NETWORKTIME_COLUMN = 14
-  val DURATION_COLUMN = 15
-  val RINGTIME_COLUMN = 16
-  val DELAYTIME_COLUMN = 17
-  val TIMETOABAND_COLUMN = 18
-  val HOLDTIME_COLUMN = 19
-  val TALKTIME_COLUMN = 20
-  val WORKTIME_COLUMN = 21
-  val LOCALQTIME_COLUMN = 22
-  val CONFERENCETIME_COLUMN = 23
-  val CALLREASON_COLUMN = 24
-  val PRODUCTTYPE_COLUMN = 25
+  val START_TIMESTAMP_COLUMN = 0
+  val END_TIMESTAMP_COLUMN = 1
+  val DURATION_COLUMN = 2
+  val ACCT_ID_COLUMN = 3
+  val CALL_ID_COLUMN = 4
+  val PRIMARYAGENTCOUNT_COLUMN = 5
+  val TOTALAGENTCOUNT_COLUMN = 6
 
-  val INPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/agent_call_segments.csv"
-  val OUTPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/calls"
-  val CSV_SEPARATOR = ","
-  val MULTIFIELD_SEPARATOR = "~"
-  val TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSSSSS"
+  val OUTPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/AgentCall"
 
-  def getRDD(sc: SparkContext): RDD[AgentCall] = {
-    val records = sc.textFile(INPUT_FILE).map(line => line.split(CSV_SEPARATOR))
-    val calls = for {
-      fields <- records
-    } yield {
-      AgentCall(
-        getTimestamp(fields(EVENT_TIMESTAMP_COLUMN), TIMESTAMP_FORMAT).get,
-        getTimestamp(fields(ANSWER_TIME_TIMESTAMP_COLUMN), TIMESTAMP_FORMAT).get,
-        getTimestamp(fields(HANGUP_TIME_TIMESTAMP_COLUMN), TIMESTAMP_FORMAT).get,
-        getTimestamp(fields(END_TIME_TIMESTAMP_COLUMN), TIMESTAMP_FORMAT).get,
-        fields(ACCT_ID_COLUMN),
-        fields(CALL_ID_COLUMN),
-        fields(SEQUENCE_NO_COLUMN),
-        fields(TRANS_TO_COLUMN),
-        fields(PRIM_AGENT_COLUMN),
-        fields(AGENTID_COLUMN),
-        fields(AGENTSKILLID_COLUMN),
-        fields(AGENTGROUPID_COLUMN),
-        fields(CALLTYPE_COLUMN),
-        fields(CALLDISPOSITION_COLUMN),
-        fields(NETWORKTIME_COLUMN).toInt,
-        fields(DURATION_COLUMN).toInt,
-        fields(RINGTIME_COLUMN).toInt,
-        fields(DELAYTIME_COLUMN).toInt,
-        fields(TIMETOABAND_COLUMN).toInt,
-        fields(HOLDTIME_COLUMN).toInt,
-        fields(TALKTIME_COLUMN).toInt,
-        fields(WORKTIME_COLUMN).toInt,
-        fields(LOCALQTIME_COLUMN).toInt,
-        fields(CONFERENCETIME_COLUMN).toInt,
-        fields(CALLREASON_COLUMN),
-        fields(PRODUCTTYPE_COLUMN))
-    }
-    calls
+  /**
+   * ----------------------------------------------------------------------
+   * Convert prim_agent = YES|NO to 1|0 to count the prim_agent occurrences.
+   * ----------------------------------------------------------------------
+   */
+  def binary(s: String): Int = {
+    if (s.toUpperCase() == "YES") 1
+    else 0
   }
+
+  /**
+   * ----------------------------------------------------------------------
+   * Set of Agent Call records
+   * ----------------------------------------------------------------------
+   */
   def getDF(sc: SparkContext): DataFrame = {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._
-    getRDD(sc).toDF()
+
+    sqlContext.udf.register("binary", binary _)
+    val df = AgentCallSegment.getDF(sc)
+    df.registerTempTable("calls")
+
+    //----------------------------------------------------------------------
+    // CREATE ONE RECORD FOR EACH CALL_ID THAT EXISTS IN AGENT CALL SEGMENTS TABLE.
+    // Aggregation table (a) extract a record for each call_id.
+    // Use MIN(start_time) and call_id to get the acct_id of the fist call segment.
+    //----------------------------------------------------------------------
+    /*
+    val sql = """
+      SELECT
+        a.call_id,
+        a.start_time,
+        a.end_time,
+        unix_timestamp(a.end_time) - unix_timestamp(a.start_time) as duration,
+        acct.acct_id,
+        a.primaryAgentCount,
+        a.totalAgentCount
+      FROM 
+      (
+        SELECT
+          call_id,
+          MIN(start_time) as start_time,
+          MAX(end_time) as end_time,
+          SUM(binary(prim_agent)) as primaryAgentCount,
+          COUNT(*) as totalAgentCount
+        FROM calls
+        GROUP BY call_id
+      ) a 
+      INNER JOIN
+      (
+        SELECT 
+          c.call_id, 
+          c.acct_id
+        FROM 
+          calls c
+          INNER JOIN
+          (
+            SELECT
+              call_id,
+              MIN(start_time) as start_time
+            FROM calls
+            GROUP BY call_id
+          ) s
+          ON 
+            c.call_id = s.call_id
+            AND c.start_time = s.start_time 
+      ) acct
+      ON a.call_id = acct.call_id
+    """
+    */
+    val sql = """
+      SELECT
+        a.call_id,
+        a.start_time,
+        a.end_time,
+        unix_timestamp(a.end_time) - unix_timestamp(a.start_time) as duration,
+        acct.acct_id,
+        a.primaryAgentCount,
+        a.totalAgentCount
+      FROM 
+      (
+        SELECT
+          call_id,
+          MIN(start_time) as start_time,
+          MAX(end_time) as end_time,
+          SUM(binary(prim_agent)) as primaryAgentCount,
+          COUNT(*) as totalAgentCount
+        FROM calls
+        GROUP BY call_id
+      ) a 
+      INNER JOIN
+      (
+        SELECT 
+          call_id, 
+          first(acct_id, false) as acct_id
+        FROM calls
+        GROUP BY call_id
+      ) acct
+      ON a.call_id = acct.call_id
+    """
+
+    val calls = sqlContext.sql(sql)
+    calls
   }
-  def save(sc: SparkContext, rdd: RDD[AgentCall], path: String = OUTPUT_FILE): Unit = {
+  
+  /**
+   * --------------------------------------------------------------------------------
+   * Save the AgentCall DataFrame to CSV under the path directory (not file).
+   * --------------------------------------------------------------------------------
+   */
+  def save(sc: SparkContext, df: DataFrame, path: String = OUTPUT_FILE): Unit = {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._
-    rdd.toDF().coalesce(1)
+    df.coalesce(1)
       .write
       .mode(SaveMode.Overwrite)
+      .option("header", true)
       .csv(path)
   }
 }
