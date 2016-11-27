@@ -1,9 +1,9 @@
 lazy val root = (project in file(".")).
   settings(
-    name := "DataFrame",
+    name := "IVR",
     version := "1.0",
 	scalaVersion := "2.11.8",
-    mainClass in Compile := Some("DataFrame")        
+    mainClass in Compile := Some("IVR")        
   )
 
 libraryDependencies ++= Seq(
