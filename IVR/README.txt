@@ -1,6 +1,3 @@
-[Results]
-Generated CSV files are in results directory.
-
 [Approach]
 Used Scala 2.11.8 and Apache Spark 2.0.2 Spark SQL and DataFrame/RDD.
 
@@ -10,17 +7,15 @@ Run sbt eclipse in the IVR directory to crate an Eclipse project.
 Remove header lines from the input files (cat file | tail -n +2).
 
 [Execution]
-%SPARK_HOME%\bin\spark-submit.cmd --class ETL --master local[1] dataframe_2.11-1.0.jar > log.txt
-
+%SPARK_HOME%\bin\spark-submit.cmd 
+  --conf spark.sql.warehouse.dir=file:///D:/Home/Workspaces/Spark/IRV 
+  --class ETL 
+  --master local[4] 
+  target\scala-2.11\ivr_2.11-1.0.jar
+  
 [ZIP structure]
 IVR
 ├── README.txt
-├── results
-│   ├── AgentCall.csv
-│   ├── AgentCallSegment.csv
-│   ├── CallInteratcion.csv
-│   ├── IVRMenu.csv
-│   └── IVRSegment.csv
 ├── build.sbt
 └── src
     └── main
