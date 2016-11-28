@@ -5,15 +5,12 @@ import org.apache.spark.streaming._
 import org.apache.spark.streaming.StreamingContext._
 
 object NQueen {
-  val n = 12
+  val n = 13
   def main(args: Array[String]): Unit = {
-    // set up able configuration
-    val sparkConf = new SparkConf()
-      .setAppName("NQueen")
-      .set("spark.files.overwrite", "true")
+    val sparkConf = new SparkConf().setAppName("NQueen").set("spark.files.overwrite", "true")
     val sc = new SparkContext(sparkConf)
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
-    
+
     //import sqlContext.implicits._
     //--------------------------------------------------------------------------------
     // [Logic]
@@ -69,10 +66,11 @@ object NQueen {
       placements.toList
     }
 
-    val initial = sc.parallelize(queensAtFirst, 12)
-    //val initial = sc.parallelize(queensAtFirst)
-    println("----------> Numberf of partitions = %d".format(initial.partitions.size))
     
+    val initial = sc.parallelize(queensAtFirst)
+    //val initial = sc.parallelize(queensAtFirst, 12)
+    println("Partitions = %d".format(initial.partitions.size))
+
     val result = initial.flatMap(x => placeQueensAt(1, Set(x))).collect()
     println("----------> Result size %d".format(result.size))
     result.take(5).foreach { x => println(x) }

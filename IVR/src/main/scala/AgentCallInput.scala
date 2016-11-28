@@ -60,7 +60,7 @@ object AgentCallInput {
   // is transferred from agent to agent). Each record in this table represents 
   // one segment of a call. 
   //----------------------------------------------------------------------  
-  val INPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/agent_call_segments.csv"
+  val INPUT_FILE = "./src/main/resources/agent_call_segments.csv"
   val CSV_SEPARATOR = ","
   val MULTIFIELD_SEPARATOR = "~"
   val TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSSSSS"
@@ -148,7 +148,7 @@ object AgentCallInput {
    * Save the record set as CSV in the path directory (not file).
    * --------------------------------------------------------------------------------
    */  
-  val OUTPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/AgentCallInput"  
+  val OUTPUT_FILE = "./src/main/resources/AgentCallInput"  
   def save(sc: SparkContext, rdd: RDD[AgentCallInput], path: String = OUTPUT_FILE): Unit = {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._

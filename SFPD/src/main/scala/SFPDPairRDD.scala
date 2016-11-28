@@ -26,6 +26,7 @@ object SFPDPairRDD {
   val Y = 10
   val PdId = 11
 
+  def section = println("--------------------------------------------------------------------------------")
   def main(args: Array[String]) {
     val conf = new SparkConf().setAppName("SFPDPairRDD")
     val sc = new SparkContext(conf)
@@ -62,6 +63,7 @@ object SFPDPairRDD {
       .map(x => (x._2, x._1))
       .sortByKey(false)
       .take(5)
+    println(top5Dists)
 
     //2. Which five addresses have the highest number of incidents?
     val top5Adds = sfpdRDD
@@ -107,24 +109,36 @@ object SFPDPairRDD {
     catJdist2.count
     /*_________________________________________________________________________*/
     /**************************Lab 4.4.1. Join PairRDD**************************/
-    //1. How many partitions are there in the sfpdRDD?
+    section
+    println("1. How many partitions are there in the sfpdRDD?")
     sfpdRDD.partitions.size
 
-    //2. How do you find the type of partitioner?
+    section
+    println("2. How do you find the type of partitioner?")
     sfpdRDD.partitioner
 
-    //3. Create a pair RDD - INcidents by district
+    section
+    println("3. Create a pair RDD - INcidents by district")
     val incByDists = sfpdRDD.map(incident => (incident(PdDistrict), 1)).reduceByKey((x, y) => x + y)
-    //How many partitions does this have?
+
+    section
+    println("//How many partitions does this have?")
     incByDists.partitions.size
-    //What is the type of partitioner?
+    
+    section
+    println("//What is the type of partitioner?")
     incByDists.partitioner
 
-    //4. Now add a map transformation
+    section
+    println("//4. Now add a map transformation")
     val inc_map = incByDists.map(x => (x._2, x._1))
-    //Is there a change in the size?
+    
+    section
+    println("//Is there a change in the size?")
     inc_map.partitions.size
-    //What about the type of partitioner?
+    
+    section
+    println("//What about the type of partitioner?")
     inc_map.partitioner
 
     //5.Add sortByKey()

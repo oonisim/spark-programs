@@ -106,7 +106,7 @@ object IVRMenu {
    * Save the record set as CSV in the path directory (not file).
    * --------------------------------------------------------------------------------
    */
-  val OUTPUT_FILE = "file:///D:/Home/Workspaces/Spark/DataFrame/src/main/resources/IVRMenu"
+  val OUTPUT_FILE = "./src/main/resources/IVRMenu"
   def save(sc: SparkContext, rdd: RDD[IVRMenu], path: String = OUTPUT_FILE): Unit = {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._
