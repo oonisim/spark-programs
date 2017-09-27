@@ -10,7 +10,7 @@ object WordCount {
     val sc = new SparkContext(sparkConf)
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
 
-    val lines = sc.textFile("hdfs:/user/wynadmin/sfpd.csv")
+    val lines = sc.textFile("hdfs:/user/spark/words.txt")
     println("Patitions = %d".format(lines.partitions.size))
     
     val words = for (line <- lines; word <- line.split(",") if word.toLowerCase.matches("[a-z]+")) yield (word, 1)
