@@ -5,6 +5,7 @@ import org.apache.spark.streaming._
 import org.apache.spark.streaming.StreamingContext._
 
 object WordCount {
+  val DELIM = ","
   def main(args: Array[String]): Unit = {
     val sparkConf = new SparkConf().setAppName("WordCount").set("spark.files.overwrite", "true")
     val sc = new SparkContext(sparkConf)
@@ -13,7 +14,7 @@ object WordCount {
     val lines = sc.textFile("hdfs:/user/spark/words.txt")
     println("Patitions = %d".format(lines.partitions.size))
     
-    val words = for (line <- lines; word <- line.split(",") if word.toLowerCase.matches("[a-z]+")) yield (word, 1)
+    val words = for (line <- lines; word <- line.split(DELIM) if word.toLowerCase.matches("[a-z]+")) yield (word, 1)
     val counts = words.reduceByKey(_ + _)
     counts.take(10).foreach(println)
   }
