@@ -7,7 +7,7 @@ Task
 
 A client has provided you with two data extracts that contain information around customer calls to a contact centre. Before the data can be loaded and analyzed in a customer journey model it needs to be transformed. You have been asked to develop a transformation routine that takes the two data extracts as an input and creates a set of five output files that can be loaded directly into a customer journey model. It is anticpiated that the client will provide updated data extracts on an ongoing basis.
 
-<img src="https://github.com/oonisim/Apache-Spark/blob/master/IVR/images/ER.png">
+<img src="https://github.com/oonisim/Apache-Spark/blob/master/IVR/images/ER.png" width=400>
 
 The first table [ivr_segments.csv](https://github.com/oonisim/Apache-Spark/tree/master/IVR/data/ivr_segments.csv) represents IVR Segments. Each record includes a set of attributes that describe the customer's traversal through the IVR. The second table [agent_call_segments.csv](https://github.com/oonisim/Apache-Spark/tree/master/IVR/data/agent_call_segments.csv) represents Agent Call Segments. A customer might talk to multiple agents during a call (i.e., the call is transferred from agent to agent). Each record in this table represents one segment of a call. A detailed description for each field is provieded Field Description tab in the [specifications](https://github.com/oonisim/Apache-Spark/tree/master/IVR/data/specifications.xlsx
 
