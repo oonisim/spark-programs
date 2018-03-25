@@ -9,6 +9,8 @@ A client has provided you with two data extracts that contain information around
 
 <img src="https://github.com/oonisim/Apache-Spark/tree/master/IVR/images/ER.png">
 
+![ER](https://github.com/oonisim/Apache-Spark/tree/master/IVR/images/ER.png)
+
 The first table [ivr_segments.csv](https://github.com/oonisim/Apache-Spark/tree/master/IVR/data/ivr_segments.csv) represents IVR Segments. Each record includes a set of attributes that describe the customer's traversal through the IVR. The second table [agent_call_segments.csv](https://github.com/oonisim/Apache-Spark/tree/master/IVR/data/agent_call_segments.csv) represents Agent Call Segments. A customer might talk to multiple agents during a call (i.e., the call is transferred from agent to agent). Each record in this table represents one segment of a call. A detailed description for each field is provieded Field Description tab in the [specifications](https://github.com/oonisim/Apache-Spark/tree/master/IVR/data/specifications.xlsx
 
 You have been asked develop a process to transform the data in the following way:
