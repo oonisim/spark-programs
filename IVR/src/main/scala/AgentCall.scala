@@ -155,7 +155,7 @@ object AgentCall {
    * Save the record set as CSV under the path directory (not file).
    * --------------------------------------------------------------------------------
    */
-  val OUTPUT_FILE = "./src/main/resources/AgentCall"
+  val OUTPUT_FILE = "src/main/resources/AgentCall"
   def save(sc: SparkContext, df: DataFrame, path: String = OUTPUT_FILE): Unit = {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._

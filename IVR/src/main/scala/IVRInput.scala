@@ -46,7 +46,7 @@ object IVRInput {
   // (ivr_segments.csv) represents IVR Segments. 
   // Each record has a set of attributes on the customer's traversal via IVR.
   //----------------------------------------------------------------------  
-  val INPUT_FILE = "./src/main/resources/ivr_segments.csv"
+  val INPUT_FILE = "src/main/resources/ivr_segments.csv"
   val CSV_SEPARATOR = ","
   val MULTIFIELD_SEPARATOR = "~"
   val TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSSSSS"
@@ -102,7 +102,7 @@ object IVRInput {
    * Save the record set as CSV in the path directory (not file).
    * --------------------------------------------------------------------------------
    */
-  val OUTPUT_FILE = "./src/main/resources/IVRInput"
+  val OUTPUT_FILE = "src/main/resources/IVRInput"
   def save(sc: SparkContext, rdd: RDD[IVRInput], path: String = OUTPUT_FILE): Unit = {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._

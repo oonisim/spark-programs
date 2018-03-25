@@ -30,7 +30,7 @@ object IVRSegment {
   val NUMBER_DIALED_COLUMN = 5
   val MENU_COUNT_COLUMN = 6
 
-  
+  val OUTPUT_FILE = "src/main/resources/IVRSegment"
 
   /**
    * --------------------------------------------------------------------------------
@@ -86,8 +86,6 @@ object IVRSegment {
    * Save the IVRSegment DataFrame to CSV under the path directory (not file).
    * --------------------------------------------------------------------------------
    */
-  //val OUTPUT_FILE = "file:///./src/main/resources/IVRSegment"
-  val OUTPUT_FILE = "./src/main/resources/IVRSegment"
   def save(sc: SparkContext, rdd: RDD[IVRSegment], path: String = OUTPUT_FILE): Unit = {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.implicits._
