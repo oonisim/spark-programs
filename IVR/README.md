@@ -41,20 +41,22 @@ Build is with build.sbt. Scala source files are in src/main/scala . Run sbt ecli
 ```
 IVR
 ├── README.md
+├── data      <--- Original input data and the specification.
+├── results   <--- Output data
 ├── build.sbt
 └── src
     └── main
-        ├── resources
+        ├── resources                   <--- Input data
         │   ├── agent_call_segments.csv <--- Header line removed
         │   └── ivr_segments.csv        <--- Header line removed
         └── scala
-            ├── AgentCall.scala
-            ├── AgentCallInput.scala
-            ├── AgentCallSegment.scala
-            ├── CallInteraction.scala
-            ├── IVR.scala
-            ├── IVRInput.scala
-            ├── IVRMenu.scala
-            ├── IVRSegment.scala
+            ├── IVR.scala               <--- Main
+            ├── IVRSegment.scala        <--- Step 1: Remove records from the "IVR Segments" table. Transform, remove and add fields.
+            ├── IVRInput.scala          <---         For step 1, load ivr_segment.csv to create a record set of the original IVR segment including DUP.
+            ├── IVRMenu.scala           <--- Step 2: Create a new "IVR Menus" table where each record represents an IVR menu step (derived from the IVR Segments data).
+            ├── AgentCallSegment.scala  <--- Step 3: Calculate duration field by end_time - start_time (in seconds).
+            ├── AgentCall.scala         <--- Step 4: Create one record for each call_id that exists in agent call segments table.
+            ├── AgentCallInput.scala    <---         For step 4, load agent_call_segments.csv to create a record set of the original Agent call segments.
+            ├── CallInteraction.scala   <--- Step 5: Create one record for each call_id that exists in ivr_segment and/or agent_call table.
             └── Utility.scala
 ```
