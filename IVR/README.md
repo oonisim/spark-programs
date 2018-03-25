@@ -27,16 +27,6 @@ Approach
 ------------
 Used Scala 2.11.8 and Apache Spark 2.0.2 Spark SQL and DataFrame/RDD.
 
-#### Eclipse setup
-Build is with build.sbt. Scala source files are in src/main/scala . Run sbt eclipse in the IVR directory to crate an Eclipse project. Remove header lines from the input files (cat file | tail -n +2).
-
-[Execution]
-%SPARK_HOME%\bin\spark-submit.cmd
-  --conf spark.sql.warehouse.dir=file:///D:/Home/Workspaces/Spark/IRV
-  --class ETL
-  --master local[4]
-  target\scala-2.11\ivr_2.11-1.0.jar
-
 #### Repository tructure
 ```
 IVR
@@ -60,3 +50,19 @@ IVR
             ├── CallInteraction.scala   <--- Step 5: Create one record for each call_id that exists in ivr_segment and/or agent_call table.
             └── Utility.scala
 ```
+
+#### Eclipse setup
+Build is with build.sbt. Scala source files are in src/main/scala . Run sbt eclipse in the IVR directory to crate an Eclipse project. Remove header lines from the input files (cat file | tail -n +2).
+
+####
+```
+%SPARK_HOME%\bin\spark-submit.cmd
+  --conf spark.sql.warehouse.dir=file:///D:/Home/Workspaces/Spark/IVR  <---- The location needs to be changed
+  --class ETL
+  --master local[4]
+  target\scala-2.11\ivr_2.11-1.0.jar   <---- The built result jar file might be different
+```
+
+#### Result
+
+Refer to the results directory.
