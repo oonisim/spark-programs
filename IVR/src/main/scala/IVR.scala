@@ -13,7 +13,7 @@ import java.util.Date
 /**
  * Process to transform the data.
  */
-object ETL {
+object IVR {
 
   def main(args: Array[String]) {
     val conf = new SparkConf().setAppName("IVR")
