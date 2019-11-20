@@ -41,7 +41,7 @@ curl -O https://repo.anaconda.com/archive/${CONDA_INSTALLER}
 echo -e '\nexport PATH=$HOME/conda/bin:$PATH' >> $HOME/.bashrc && source $HOME/.bashrc
 conda config --set auto_activate_base true
 conda init
-```
+``` 
 
 ### Create and activate Anaconda environment
 ```aidl
