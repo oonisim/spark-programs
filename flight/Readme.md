@@ -7,19 +7,30 @@
 ### flightData.csv
 
 |     Field    | Description | 
-| ------------- |:-------------| 
+| -------------|:-------------| 
 | passengerId | Integer representing the id of a passenger | 
 | flightId |Integer representing the id of a flight | 
 | from | String representing the departure country | 
 | to   | String representing the destination country | 
 | date | String representing the date of a flight | 
 
+# Runtime environment
+
+|   Component    | Description | 
+| -------------|:-------------| 
+| OS | 18.04.3 LTS (Bionic Beaver) | 
+| JDK | build 1.8.0_222-8u222-b10-1ubuntu1~18.04.1-b10 | 
+| Scala | 2.11.12 |
+| Spark | 2.4.4 | 
+| Python | Python 3.6.9 :: Anaconda, Inc|
+| Toree | 0.3.0 |
+
 
 ## Spark via Jupyter Notebook
 
 Using [Apache Toree](https://toree.apache.org/), which is the tool to use Apache Spark via Jupyter Notebook.
 
-#### Anaconda Installation
+### Anaconda installation
 
 ```
 # https://docs.anaconda.com/anaconda/install/silent-mode/#
@@ -32,7 +43,7 @@ conda config --set auto_activate_base true
 conda init
 ```
 
-#### Create and activate Anaconda environment
+### Create and activate Anaconda environment
 ```aidl
 EXPORT ENV='YOUR ENVIRONMENT/PROJECT NAME'
 EXPORT SPARK_HOME='YOUR SPARK HOME'
@@ -47,7 +58,7 @@ SPARK_OPTS='--master=local[*]' jupyter notebook
 
 
 
-## Directory Structure
+# Directory Structure
 
 ```
 src/main
