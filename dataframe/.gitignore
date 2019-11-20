@@ -2,3 +2,4 @@
 .target
 project/target
 src/main/.ipynb_checkpoints
+*/.ipynb_checkpoints
