@@ -62,7 +62,7 @@ SPARK_OPTS='--master=local[*]' jupyter notebook
 
 
 
-# Directory Structure
+# Output Directory Structure
 
 ```
 Flight/src/main/
