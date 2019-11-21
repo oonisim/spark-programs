@@ -1,7 +1,10 @@
 # Flight data analysis
 
 ## Assumptions
-* Data is cleaned and not erroneous.
+* Data is cleaned and not erroneous, e.g. no duplicate, no NaN, no null, incorrect format, etc.
+* No need to consider time zone
+* "More than N" means N is not included. e.g. More than 3 is 4, 5, 6, ...
+* Duplicating same information is to be removed. e.g. (Smith, John, 15) and (John, Smith 15) meaning Smith and John share 15 flights are to be reduced to (John, Smith, 15) only.
 
 ## Data
 ### flightData.csv
