@@ -3,3 +3,8 @@
 project/target
 src/main/.ipynb_checkpoints
 */.ipynb_checkpoints
+/src/main/jupyter/.ipynb_checkpoints/
+/src/main/jupyter/results/flightsTogether/
+/src/main/jupyter/results/flightsTogetherMatrix/
+/src/main/jupyter/results/longestRun/
+/src/main/jupyter/results/topFrequentFlyers/
