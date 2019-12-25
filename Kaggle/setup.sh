@@ -1,14 +1,14 @@
 echo "Source this file, not execute"
 
 set -eu
-export ENV=Dataframe
+export ENV=Kaggle
 
 conda create -n ${ENV} python=3.6
 conda activate ${ENV}
 
 conda install jupyter notebook
 pip3 install --upgrade toree
-jupyter toree install --spark_home=${SPARK_HOME} --interpreters=Scala,PySpark,SQL --user
+jupyter toree install --spark_home=${SPARK_HOME} --interpreters=Scala,SQL --user
 
 #------------------------------------------------------------------------------------------
 # Run Toree
