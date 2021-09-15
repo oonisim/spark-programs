@@ -1,5 +1,6 @@
 .idea
-/Dataframe/src/.ipynb_checkpoints/
+venv/
+**/.ipynb_checkpoints/
 /Streaming/data/
 /Dataframe/data/
 /DefinitiveGuide/code/
