@@ -7,3 +7,4 @@ venv/
 /DefinitiveGuide/code/
 /DefinitiveGuide/data/
 /Kaggle/DigitRecognizer/src/.ipynb_checkpoints/
+**/.pytest_cache
